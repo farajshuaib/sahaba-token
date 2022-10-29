@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SahabaTokenVendor is Ownable {
     SahabaToken tokenContract;
-    uint256 public tokensPerEth = 0.01 ether;
+    uint256 private tokenPrice = 1000000000000000; // in wei
     event BuyTokens(address buyer, uint256 amountOfEth, uint256 amountOfTokens);
 
     constructor(address tokenAddress) {
@@ -15,7 +15,7 @@ contract SahabaTokenVendor is Ownable {
 
     function buyTokens() public payable returns (uint256 tokenAmount) {
         require(msg.value > 0, "You need to send some Eth to proceed");
-        uint256 amountToBuy = msg.value * tokensPerEth;
+        uint256 amountToBuy = msg.value * tokenPrice;
 
         uint256 vendorBalance = tokenContract.balanceOf(address(this));
         require(vendorBalance >= amountToBuy, "Vendor has insufficient tokens");
@@ -27,8 +27,8 @@ contract SahabaTokenVendor is Ownable {
         return amountToBuy;
     }
 
-    function tokenPrice(uint256 _tokensPerEth) public {
-        tokensPerEth = _tokensPerEth;
+    function getTokenPrice() public view returns (uint256) {
+        return tokenPrice;
     }
 
     function sellTokens(uint256 tokenAmountToSell) public {
@@ -43,7 +43,7 @@ contract SahabaTokenVendor is Ownable {
             "You have insufficient tokens"
         );
 
-        uint256 amountOfEthToTransfer = tokenAmountToSell / tokensPerEth;
+        uint256 amountOfEthToTransfer = tokenAmountToSell / tokenPrice;
         uint256 ownerEthBalance = address(this).balance;
         require(
             ownerEthBalance >= amountOfEthToTransfer,
@@ -67,15 +67,8 @@ contract SahabaTokenVendor is Ownable {
         require(sent, "Failed to withdraw");
     }
 
-    function totalTokenSold() public view returns (uint256) {
-        return tokenContract.totalSupply() - tokenContract.balanceOf(address(this));
-    }
-
-    function totalEthReceived() public view returns (uint256) {
-        return address(this).balance;
-    }
-
     function totalTokenForSale() public view returns (uint256) {
         return tokenContract.balanceOf(address(this));
     }
+
 }
