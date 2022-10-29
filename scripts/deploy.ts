@@ -12,15 +12,13 @@ async function main() {
   await run("verify:verify", {
     address: SahabaToken.address,
     contract: "contracts/SahabaToken.sol:SahabaToken",
-    
-
   });
 
   const SahabaTokenVendorContract = await ethers.getContractFactory(
     "SahabaTokenVendor"
   );
   const SahabaTokenVendor = await SahabaTokenVendorContract.deploy(
-    SahabaToken.address
+   SahabaToken.address
   );
   await SahabaTokenVendor.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
   await SahabaTokenVendor.deployed();
@@ -28,7 +26,7 @@ async function main() {
   await run("verify:verify", {
     address: SahabaTokenVendor.address,
     constructorArguments: [SahabaToken.address],
-    contract: "contracts/SahabaTokenVendor.sol",
+    contract: "contracts/SahabaTokenVendor.sol:SahabaTokenVendor",
   });
 
 

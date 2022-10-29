@@ -27,6 +27,10 @@ contract SahabaTokenVendor is Ownable {
         return amountToBuy;
     }
 
+    function tokenPrice(uint256 _tokensPerEth) public {
+        tokensPerEth = _tokensPerEth;
+    }
+
     function sellTokens(uint256 tokenAmountToSell) public {
         require(
             tokenAmountToSell > 0,
@@ -61,5 +65,17 @@ contract SahabaTokenVendor is Ownable {
         require(ownerBalance > 0, "No ETH present in Vendor");
         (bool sent, ) = msg.sender.call{value: address(this).balance}("");
         require(sent, "Failed to withdraw");
+    }
+
+    function totalTokenSold() public view returns (uint256) {
+        return tokenContract.totalSupply() - tokenContract.balanceOf(address(this));
+    }
+
+    function totalEthReceived() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function totalTokenForSale() public view returns (uint256) {
+        return tokenContract.balanceOf(address(this));
     }
 }
