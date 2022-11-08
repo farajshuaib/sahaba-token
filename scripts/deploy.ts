@@ -4,84 +4,48 @@ import { parseEther } from "ethers/lib/utils";
 
 const WAIT_BLOCK_CONFIRMATIONS = 6;
 
-async function deploySahabaToken() {
-  const SahabaTokenContract = await ethers.getContractFactory("SahabaToken");
-  const SahabaToken = await SahabaTokenContract.deploy();
+async function deploySahabaCoin() {
+  const SahabaCoinContract = await ethers.getContractFactory("SahabaCoin");
+  const SahabaCoin = await SahabaCoinContract.deploy();
 
-  await SahabaToken.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
-  await SahabaToken.deployed();
-
-  await run("verify:verify", {
-    address: SahabaToken.address,
-    contract: "contracts/SahabaToken.sol:SahabaToken",
-  });
-
-  return SahabaToken;
-}
-
-async function deployKycContract() {
-  const KycContract = await ethers.getContractFactory("KycContract");
-  const Kyc = await KycContract.deploy();
-
-  await Kyc.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
-  await Kyc.deployed();
+  await SahabaCoin.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
+  await SahabaCoin.deployed();
 
   await run("verify:verify", {
-    address: Kyc.address,
-    contract: "contracts/KycContract.sol:KycContract",
+    address: SahabaCoin.address,
+    contract: "contracts/SahabaCoin.sol:SahabaCoin",
   });
 
-  return Kyc;
+  return SahabaCoin;
 }
 
-async function deployICOContract(
-  wallet_address: string,
-  SahabaTokenAddress: string,
-  KycAddress: string
-) {
+async function deploySwapContract() {
   const rate = parseEther("100");
-  const ICO_Contract = await ethers.getContractFactory("ICO");
-  const ICO = await ICO_Contract.deploy(
-    rate,
-    wallet_address,
-    SahabaTokenAddress,
-    KycAddress
+  const Swap_Contract = await ethers.getContractFactory("SahabaSwap");
+  const Swap = await Swap_Contract.deploy(
+    "0x54460CC6574442b1ac12dd71C509Ac421E3Ab031",
+    rate
   );
-  await ICO.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
-  await ICO.deployed();
+  await Swap.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
+  await Swap.deployed();
 
   await run("verify:verify", {
-    address: ICO.address,
-    constructorArguments: [
-      rate,
-      wallet_address,
-      SahabaTokenAddress,
-      KycAddress,
-    ],
-    contract: "contracts/ICO.sol:ICO",
+    address: Swap.address,
+    constructorArguments: ["0x54460CC6574442b1ac12dd71C509Ac421E3Ab031", rate],
+    contract: "contracts/SahabaSwap.sol:SahabaSwap",
   });
 
-  return ICO;
+  return Swap;
 }
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
-
-  const SahabaToken = "0xc18C64d0d70771C1Dc757daF0D98003BfEB9A5B9"// await deploySahabaToken();
+  // const SahabaToken = await deploySahabaCoin();
 
   // console.log("SahabaToken deployed to:", SahabaToken.address);
 
-  const Kyc = "0x88A99d5fe8c8A69DAB5A73C22a5997Fc29B8F0fb" // await deployKycContract();
+  const Swap = await deploySwapContract();
 
-  // console.log("Kyc deployed to:", Kyc.address);
-
-  const ICO = await deployICOContract(
-    deployer.address,
-    SahabaToken,
-    Kyc
-  );
-
-  console.log("ICO deployed to:", ICO.address); // "0xb4FAb02c1b41fA4C762CB35B50799bD440Ec07eF"
+  console.log("Swap deployed to:", Swap.address); // "0xb4FAb02c1b41fA4C762CB35B50799bD440Ec07eF"
 }
 
 // We recommend this pattern to be able to use async/await everywhere
