@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "./OwnerWithdrawable.sol";
 
-contract SahabaSwap is OwnerWithdrawable {
+contract PreSale is OwnerWithdrawable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using SafeERC20 for IERC20Metadata;

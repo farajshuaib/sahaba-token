@@ -19,30 +19,30 @@ async function deploySahabaCoin() {
   return SahabaCoin;
 }
 
-async function deploySwapContract(SahabaToken_address: string) {
+async function deployPreSaleContract(SahabaToken_address: string) {
   const rate = parseEther("0.01");
-  const Swap_Contract = await ethers.getContractFactory("SahabaSwap");
-  const Swap = await Swap_Contract.deploy(SahabaToken_address, rate);
-  await Swap.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
-  await Swap.deployed();
+  const PreSale_Contract = await ethers.getContractFactory("PreSale");
+  const PreSale = await PreSale_Contract.deploy(SahabaToken_address, rate);
+  await PreSale.deployTransaction.wait(WAIT_BLOCK_CONFIRMATIONS);
+  await PreSale.deployed();
 
   await run("verify:verify", {
-    address: Swap.address,
+    address: PreSale.address,
     constructorArguments: [SahabaToken_address, rate],
-    contract: "contracts/SahabaSwap.sol:SahabaSwap",
+    contract: "contracts/PreSale.sol:PreSale",
   });
 
-  return Swap;
+  return PreSale;
 }
 
 async function main() {
   const SahabaToken = await deploySahabaCoin();
 
-  console.log("SahabaToken deployed to:", SahabaToken.address);
+  console.log("SahabaCoin deployed to:", SahabaToken.address);
 
-  const Swap = await deploySwapContract(SahabaToken.address);
+  const PreSale = await deployPreSaleContract(SahabaToken.address);
 
-  console.log("Swap deployed to:", Swap.address);
+  console.log("PreSale deployed to:", PreSale.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
